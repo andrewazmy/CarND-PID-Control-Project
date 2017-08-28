@@ -76,22 +76,22 @@ int main()
           std::cout << dt << std::endl;
 
 
-          pid_steer.UpdateError(cte, dt);
+          pid_steer.UpdateError(cte);
           steer_value = pid_steer.TotalError();
           if (steer_value > 1){steer_value = 1;}
 
           if (steer_value < -1){steer_value = -1;}
 
 
-          pid_throttle.UpdateError(fabs(cte), dt);     // |cte|
-          throttle_value = 0.75 + pid_throttle.TotalError();
-
+          pid_throttle.UpdateError(fabs(cte));     // |cte|
+          throttle_value = 0.5 + pid_throttle.TotalError();
+          if (throttle_value < 0){throttle_value = 0;}
           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
 
           json msgJson;
           msgJson["steering_angle"] = steer_value;
-          msgJson["throttle"] = 0.1;//throttle_value;
+          msgJson["throttle"] = throttle_value;
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
           std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
