@@ -33,17 +33,16 @@ int main()
   uWS::Hub h;
 
   PID pid_steer;
-  PID pid_throttle;
+  PID pid_throttle; 
   // TODO: Initialize the pid variable.
 
 
   double c_time = 0.0; // Current frame time
-  double p_time = clock(); // Previous frame time 
+  double p_time = clock(); // Previous frame time
   double t = 0.0;  // Total time
 
 
-  pid_steer.Init(0.35, 0.01, 0.004);
-
+  pid_steer.Init(0.134611, 0.000270736, 3.05349);
   pid_throttle.Init(0.316731, 0.0000, 0.0226185);
 
 
