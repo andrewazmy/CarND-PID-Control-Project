@@ -36,17 +36,12 @@ int main()
   PID pid_throttle; 
   // TODO: Initialize the pid variable.
 
+  pid_steer.Init(0.14, 0.00, 3.1);
+  pid_throttle.Init(0.3, 0.0, 0.0);  
+  // pid_steer.Init(0.134611, 0.000270736, 3.05349);
+  // pid_throttle.Init(0.316731, 0.0000, 0.0226185);
 
-  double c_time = 0.0; // Current frame time
-  double p_time = clock(); // Previous frame time
-  double t = 0.0;  // Total time
-
-
-  pid_steer.Init(0.134611, 0.000270736, 3.05349);
-  pid_throttle.Init(0.316731, 0.0000, 0.0226185);
-
-
-  h.onMessage([&pid_steer, &pid_throttle, &c_time, &p_time, &t](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
+  h.onMessage([&pid_steer, &pid_throttle](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
@@ -71,21 +66,16 @@ int main()
           */
           // steer_value = 0.0;
 
-          c_time = clock();
-          double dt = (c_time - p_time) / CLOCKS_PER_SEC;
-          std::cout << dt << std::endl;
-
-
           pid_steer.UpdateError(cte);
-          steer_value = pid_steer.TotalError();
+          steer_value = pid_steer.TotalError(speed);
           if (steer_value > 1){steer_value = 1;}
 
           if (steer_value < -1){steer_value = -1;}
 
 
           pid_throttle.UpdateError(fabs(cte));     // |cte|
-          throttle_value = 0.5 + pid_throttle.TotalError();
-          if (throttle_value < 0){throttle_value = 0;}
+          throttle_value = 0.65 + pid_throttle.TotalError(0.0);
+          if (speed < 30 && throttle_value < 0.3){throttle_value = 0.3;}
           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
 
